@@ -1,6 +1,10 @@
 from time import sleep
 from serial import Serial
 
+# to make pyserial work, either give read and write permission to the virtual driver
+# or add current user to group dialout
+# $sudo usermod -a -G dialout <username>
+
 class serUtil:
     def __init__(self, portname, baudrate=9600, readTimeOut=None, writeTimeOut=None):
         self.portname = portname
@@ -12,7 +16,7 @@ class serUtil:
             timeout=readTimeOut, write_timeout=writeTimeOut)
 
     def __str__(self) -> str:
-        return self.__portname__
+        return self.portname
 
     def __del__(self):
         self.ser.close()

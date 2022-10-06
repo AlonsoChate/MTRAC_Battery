@@ -3,7 +3,8 @@ from config import inst
 
 class batteryModule:
     def __init__(self):
-        self.serial = serUtil('/dev/ttyS5', 612500)
+        # configure serial here
+        self.serial = serUtil('/dev/ttyS5', 9600, 5, 5)
         # volt & temp
         self.cellVolt = [0] * 6
         self.moduleVolt = 0
@@ -17,7 +18,7 @@ class batteryModule:
 
     def readStatus(self):
         # read any alerts or faults
-        addr = self.moduleAddr << 1
+        addr = bytes([self.moduleAddr << 1])
         command = addr + bytes([inst['REG_ALERT_STATUS']]) + bytes([0x04])
         response = self.serial.query(command, 7, False)
         self.alerts = response[3]
