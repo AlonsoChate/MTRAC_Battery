@@ -32,9 +32,9 @@ class serUtil:
             crc &= mask
             for _ in range(8):
                 if (crc & 0x80) != 0:
-                    crc = (crc << 1) & mask ^ generator
+                    crc = ((crc << 1) & mask) ^ generator
                 else:
-                    crc = crc << 1 & mask
+                    crc = (crc << 1) & mask
         return bytes([crc & mask])
 
     def sendCommand(self, command: bytes, withCRC=False):
@@ -48,7 +48,7 @@ class serUtil:
         numBytes += self.ser.write(bytes([addr]))
         numBytes += self.ser.write(rest)
         if withCRC:
-            crc = self.genCRC(command)
+            crc = self.genCRC(bytes([addr]) + rest)
             numBytes += self.ser.write(crc)
         return numBytes
 
@@ -64,7 +64,7 @@ class serUtil:
             # give 5 attemps
             self.sendCommand(command, withCRC)
             # TODO test delay time later
-            # sleep(2 * (retLen / 8) + 1)
+            sleep(2 * (retLen / 8) + 1)
             response = self.getResponse(retLen)
             if len(response) == retLen:
                 return response 

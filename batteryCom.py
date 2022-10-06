@@ -4,7 +4,7 @@ from config import inst
 class batteryModule:
     def __init__(self):
         # configure serial here
-        self.serial = serUtil('/dev/ttyS5', 9600, 5, 5)
+        self.serial = serUtil('/dev/ttyUSB0', 612500, 5, 5)
         # volt & temp
         self.cellVolt = [0] * 6
         self.moduleVolt = 0
@@ -16,6 +16,12 @@ class batteryModule:
         self.COVFaults = 0
         self.CUVFaults = 0
 
+    def reset(self):
+        command = bytes([0x3F << 1]) + bytes([0x3C]) + bytes([0xA5])
+
+        response = self.serial.query(command, 4, True)
+        pass
+
     def readStatus(self):
         # read any alerts or faults
         addr = bytes([self.moduleAddr << 1])
@@ -25,6 +31,7 @@ class batteryModule:
         self.faults = response[4]
         self.COVFaults = response[5]
         self.CUVFaults = response[6]
+        pass
 
     def readValues(self):
         # read temperature and voltage
@@ -36,7 +43,7 @@ class batteryModule:
         self.serial.query(command, 3, True)
 
         # enable temperature measurement VSS pins
-        command = addr + bytes([inst['REG_TO_CTRL']]) + bytes([0b00000011])
+        command = addr + bytes([inst['REG_IO_CTRL']]) + bytes([0b00000011])
         self.serial.query(command, 3, True)
 
         # start all ADC conversions
