@@ -64,5 +64,3 @@ class batteryPack:
         Ser.query(command, 4, True) 
 
         print("Clear faults")
-
-

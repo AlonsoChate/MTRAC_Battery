@@ -14,6 +14,7 @@ class batteryModule:
         self.faults = 0
         self.COVFaults = 0
         self.CUVFaults = 0
+        self.isBalanced = False
 
     def readStatus(self):
         # read any alerts or faults
@@ -75,5 +76,12 @@ class batteryModule:
         return result - 273.15
 
     def balance(self):
-        # TODO:
-        pass
+        # balance point
+        balanceVolt = 3.9
+
+        addr = bytes([self.moduleAddr << 1])
+        # resets balance time and should be done before setting balance resistors again
+        command = addr + bytes([inst['REG_BAL_CTRL']]) + bytes([0])
+        Ser.query(command, 30, True)
+        
+        
