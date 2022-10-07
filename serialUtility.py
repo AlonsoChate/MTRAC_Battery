@@ -90,11 +90,13 @@ class serUtil:
         for _ in range(3):
             # give 3 attemps
             self.sendCommand(command, withCRC)
-            # TODO test delay time later
-            sleep(2 * (retLen / 8) + 1)
+            # test delay time later
+            # depends on the platform
+            # sleep(2 * (retLen / 8) + 1)
             response = self.getResponse(retLen)
             if len(response) == retLen:
                 return response 
         return response
 
-Ser = serUtil('/dev/ttyUSB0', 612500, 5, 5)
+# give 3s for read or write timeout
+Ser = serUtil('/dev/ttyUSB0', 612500, 3, 3)
