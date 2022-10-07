@@ -1,4 +1,3 @@
-from urllib import response
 from batteryModule import batteryModule
 from serialUtility import Ser, inst
 
