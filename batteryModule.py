@@ -16,6 +16,12 @@ class batteryModule:
         self.CUVFaults = 0
         self.isBalanced = False
 
+    def update(self):
+        # read both status and temp&volt
+        self.readStatus()
+        self.balance()
+        self.readValues()
+
     def readStatus(self):
         # read any alerts or faults
         addr = bytes([self.moduleAddr << 1])
@@ -76,11 +82,36 @@ class batteryModule:
 
     def balance(self):
         # balance point
+        # should call balance before readValue()
         balanceVolt = 3.9
+        balanceState = 0
 
         addr = bytes([self.moduleAddr << 1])
         # resets balance time and should be done before setting balance resistors again
         command = addr + bytes([inst['REG_BAL_CTRL']]) + bytes([0])
-        Ser.query(command, 30, True)
+        Ser.query(command, 4, True)
+
+        # check necessarity for balancing
+        for i in range(6):
+            if self.cellVolt[i] > balanceVolt:
+                self.cellBalance[i] = True
+                balanceState |= (1 << i)
+        if False in self.cellBalance:
+            command = addr + bytes([inst['REG_BAL_TIME']]) + bytes([0x82])
+            # balance for 2min, the last byte is time
+            Ser.query(command, 4, True)
+
+            command = addr + bytes([inst['REG_BAL_CTRL']]) + bytes([balanceState])
+            # write balance state to register
+            Ser.query(command, 4, True)
+
+            print("Balancing cell")
+
+            
+
+
+
+
         
+
         

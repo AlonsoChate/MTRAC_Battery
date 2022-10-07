@@ -4,6 +4,9 @@ from serialUtility import Ser, inst
 class batteryPack:
     def __init__(self):
         self.modules = []
+        self.reset()        # reset all address
+        self.setBoardAddr() # set sequential addr
+        self.clearFaults()  # clear faults by reset
 
     def reset(self):
         # broadcast to set the address of all boards to 0
@@ -14,7 +17,6 @@ class batteryPack:
             if response[0]==0x7F and response[1]==0x3c and response[2]==0xa5:
                 print("Reset successful")
                 break
-        self.setBoardAddr()
 
     def setBoardAddr(self):
         # set the address of board (start from 1) after reset()
