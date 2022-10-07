@@ -5,5 +5,11 @@ tesla = batteryPack()
 tesla.reset()
 tesla.clearFaults()
 
-test = batteryModule()
-test.readStatus()
+
+mod : batteryModule = tesla.modules[0]
+
+mod.readStatus()
+
+mod.readValues()
+
+pass

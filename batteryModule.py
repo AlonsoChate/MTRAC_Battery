@@ -28,8 +28,8 @@ class batteryModule:
 
     def readValues(self):
         # read temperature and voltage
+        print("Module %d readValue()" % self.moduleAddr)
         addr = bytes([self.moduleAddr << 1])
-        self.readStatus()
 
         # ADC Auto mode, read every ADC input we can (Both Temps, Pack, 6 cells)
         command = addr + bytes([inst['REG_ADC_CTRL']]) + bytes([0b00111101])
@@ -55,15 +55,14 @@ class batteryModule:
         # 2: requested number of values
         # 3-20: value
         # 21: CRC check
-        CRC = Ser.genCRC(response[:-1])
-        if response[0] == addr and response[1] == inst['REG_GPAI'] \
-        and response[3] == 0x12 and response[4] == CRC:
+        CRC = int.from_bytes(Ser.genCRC(response[:-1]), 'big')
+        if response[0] == (self.moduleAddr << 1) and response[1] == inst['REG_GPAI'] and response[2] == 0x12 and response[21] == CRC:
             self.moduleVolt = (response[3]*256+response[4])*0.002034609
             for i in range(6):
                 self.cellVolt[i] = (response[5+i*2]*256 + response[6+i*2])*0.000381493
             self.temperature[0] = self.calTemp(response[17], response[18])
             self.temperature[1] = self.calTemp(response[19], response[20])
-            print("Successfully read temp and voltages")
+            print("Successfully read temp and volt")
             return True
         print("Invalid response for readValue()")
         return False

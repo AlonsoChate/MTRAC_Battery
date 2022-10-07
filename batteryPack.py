@@ -21,16 +21,18 @@ class batteryPack:
         # basically query address 0 and then set the address 
         # if send a command to address 0 and no one responds then every board is inialized
         # will spend some time when there's no response (every board is set)
-        index = 0
+        index = 1 # start assign from 1
         while True:
             command = bytes([0]) + bytes([0]) + bytes([1])
             response = Ser.query(command, 4, False)
             if len(response) == 4:
+                # there's board with address 0
                 if response[0]==0x80 and response[1]==0 and response[2]==1:
-                    command = bytes([0]) + bytes([inst['REG_ADDR_CTRL']]) + bytes([index | 0x80])
-                    response = Ser.query(command, 10, True)
+                    print("Response of address 0")
+                    command = bytes([0]) + bytes([inst['REG_ADDR_CTRL']]) + bytes([index + 0x80])
+                    response = Ser.query(command, 4, True)
                     # check response
-                    if response[0]==0x81 and response[1]==inst['REG_ADDR_CTRL'] and response[2]==(index|0x80):
+                    if response[0]==0x81 and response[1]==inst['REG_ADDR_CTRL'] and response[2]==(index+0x80):
                         temp = batteryModule()
                         temp.moduleAddr = index
                         self.modules.append(temp)
