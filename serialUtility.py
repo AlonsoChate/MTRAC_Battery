@@ -62,8 +62,8 @@ class serUtil:
 
     def query(self, command: bytes, retLen, withCRC=False):
         # send command and get response
-        for _ in range(5):
-            # give 5 attemps
+        for _ in range(3):
+            # give 3 attemps
             self.sendCommand(command, withCRC)
             # TODO test delay time later
             sleep(2 * (retLen / 8) + 1)

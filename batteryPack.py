@@ -1,12 +1,13 @@
+from urllib import response
 from batteryModule import batteryModule
 from serialUtility import Ser, inst
 
 class batteryPack:
     def __init__(self):
-        pass
+        self.modules = []
 
     def reset(self):
-        # broadcast to set the address of boards to 0
+        # broadcast to set the address of all boards to 0
         # and then assign address start from 1
         command = bytes([0x3F << 1]) + bytes([0x3C]) + bytes([0xA5])
         for _ in range(3): # give 3 attemps
@@ -17,7 +18,29 @@ class batteryPack:
         self.setBoardAddr()
 
     def setBoardAddr(self):
-        pass
+        # set the address of board (start from 1) after reset()
+        # basically query address 0 and then set the address 
+        # if send a command to address 0 and no one responds then every board is inialized
+        # will spend some time when there's no response (every board is set)
+        index = 0
+        while True:
+            command = bytes([0]) + bytes([0]) + bytes([1])
+            response = Ser.query(command, 4, False)
+            if len(response) == 4:
+                if response[0]==0x80 and response[1]==0 and response[2]==1:
+                    command = bytes([0]) + bytes([inst['REG_ADDR_CTRL']]) + bytes([index | 0x80])
+                    response = Ser.query(command, 10, True)
+                    # check response
+                    if response[0]==0x81 and response[1]==inst['REG_ADDR_CTRL'] and response[2]==(index|0x80):
+                        temp = batteryModule()
+                        temp.moduleAddr = index
+                        self.modules.append(temp)
+                        print("Address %d set" % index)
+                        index += 1
+            else:
+                # every board is set
+                print("setBoard: all boards set")
+                return
 
     def clearFaults(self):
         # broadcast to clear the faults and alerts caused by reset
