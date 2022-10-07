@@ -106,12 +106,3 @@ class batteryModule:
             Ser.query(command, 4, True)
 
             print("Balancing cell")
-
-            
-
-
-
-
-        
-
-        
